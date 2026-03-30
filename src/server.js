@@ -41,15 +41,16 @@ app.get('/api/logs', (_req, res) => {
 });
 
 app.post('/api/connect', async (req, res) => {
-  const { username, identifier, password } = req.body || {};
+  const { username, identifier, password, proxyUrl } = req.body || {};
   const loginId = (identifier || username || '').trim();
+  const chosenProxy = (proxyUrl || process.env.IG_PROXY_URL || '').trim();
 
   if (!loginId || !password) {
     return res.status(400).json({ ok: false, error: 'identifier and password are required.' });
   }
 
   try {
-    const result = await bridge.connect({ username: loginId, password });
+    const result = await bridge.connect({ username: loginId, password, proxyUrl: chosenProxy });
     return res.json({ ok: true, ...result });
   } catch (error) {
     logger.error('Instagram connect failed.', { error: error.message });

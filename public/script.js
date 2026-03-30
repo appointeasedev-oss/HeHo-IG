@@ -45,11 +45,12 @@ connectForm.addEventListener('submit', async (event) => {
 
   const username = document.getElementById('username').value.trim();
   const password = document.getElementById('password').value;
+  const proxyUrl = document.getElementById('proxyUrl').value.trim();
 
   const res = await fetch('/api/connect', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, password }),
+    body: JSON.stringify({ identifier: username, password, proxyUrl }),
   });
 
   const data = await res.json();

@@ -17,6 +17,7 @@ Set these in Railway Variables:
 - `HEHO_API_KEY`
 - `HEHO_CHATBOT_ID`
 - `SESSION_SECRET` (any random secret)
+- `IG_PROXY_URL` (optional but recommended on Railway if IG rejects cloud IPs)
 - `PORT` (Railway usually injects this automatically)
 
 Use `.env.example` as reference.
@@ -35,7 +36,7 @@ Open `http://localhost:3000`.
 - `GET /api/status` → current connection status
 - `GET /api/logs` → UI logs
 - `POST /api/connect` → connect Instagram
-  - body: `{ "identifier": "username-or-email-or-phone", "password": "..." }`
+  - body: `{ "identifier": "username-or-email-or-phone", "password": "...", "proxyUrl": "optional" }`
 - `POST /api/disconnect` → disconnect bridge
 - `POST /api/chat` → chat with Heho from UI
   - body: `{ "message": "Hello" }`
