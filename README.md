@@ -35,7 +35,7 @@ Open `http://localhost:3000`.
 - `GET /api/status` → current connection status
 - `GET /api/logs` → UI logs
 - `POST /api/connect` → connect Instagram
-  - body: `{ "username": "...", "password": "..." }`
+  - body: `{ "identifier": "username-or-email-or-phone", "password": "..." }`
 - `POST /api/disconnect` → disconnect bridge
 - `POST /api/chat` → chat with Heho from UI
   - body: `{ "message": "Hello" }`

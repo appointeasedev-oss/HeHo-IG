@@ -1,4 +1,4 @@
-const { IgApiClient } = require('instagram-private-api');
+const { IgApiClient, IgCheckpointError, IgLoginBadPasswordError } = require('instagram-private-api');
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -21,21 +21,55 @@ class InstagramBridge {
       return { connected: true, username: this.username };
     }
 
+    const normalized = String(username || '').trim();
+    if (!normalized) {
+      throw new Error('Instagram username/email/phone is required.');
+    }
+
     const ig = new IgApiClient();
-    ig.state.generateDevice(username);
+    ig.state.generateDevice(normalized);
 
-    this.logger.info('Instagram login started.', { username });
-    const account = await ig.account.login(username, password);
+    this.logger.info('Instagram login started.', { username: normalized });
 
-    this.ig = ig;
-    this.myUserId = account?.pk ? String(account.pk) : null;
-    this.connected = true;
-    this.username = username;
+    try {
+      await ig.simulate.preLoginFlow();
+      await delay(1000 + Math.floor(Math.random() * 1000));
 
-    this.logger.info('Instagram login successful. Bridge connected.', { username });
-    this.startPolling();
+      const account = await ig.account.login(normalized, password);
+      process.nextTick(async () => {
+        try {
+          await ig.simulate.postLoginFlow();
+        } catch (postLoginError) {
+          this.logger.warn('Post-login simulation warning.', { error: postLoginError.message });
+        }
+      });
 
-    return { connected: true, username };
+      this.ig = ig;
+      this.myUserId = account?.pk ? String(account.pk) : null;
+      this.connected = true;
+      this.username = account?.username || normalized;
+
+      this.logger.info('Instagram login successful. Bridge connected.', { username: this.username });
+      this.startPolling();
+
+      return { connected: true, username: this.username };
+    } catch (error) {
+      if (error instanceof IgLoginBadPasswordError) {
+        throw new Error('Instagram rejected login credentials. Verify username/email/phone and password.');
+      }
+
+      if (error instanceof IgCheckpointError) {
+        throw new Error('Instagram checkpoint/challenge required. Open Instagram app/web and complete security challenge first.');
+      }
+
+      if (String(error.message || '').includes("We can't find an account")) {
+        throw new Error(
+          "Instagram says account was not found. Try the account's exact @username (not display name), or login email/phone."
+        );
+      }
+
+      throw error;
+    }
   }
 
   disconnect() {
@@ -106,7 +140,6 @@ class InstagramBridge {
         }
 
         await this.handleIncomingMessage({
-          thread,
           threadId,
           text: item.text,
           senderId: item.user_id,
