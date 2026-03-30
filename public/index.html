@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Heho × Instagram Bridge</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <section class="card">
+        <h1>Heho × Instagram Bridge</h1>
+        <p class="muted">Railway-ready dashboard to connect Instagram and auto-reply via Heho.</p>
+        <div id="statusPill" class="pill disconnected">Disconnected</div>
+
+        <form id="connectForm" class="grid">
+          <label>
+            Instagram Username / Email / Phone
+            <input id="username" name="username" required autocomplete="username" placeholder="example: your_username or email" />
+          </label>
+          <label>
+            Instagram Password
+            <input id="password" name="password" type="password" required autocomplete="current-password" />
+          </label>
+          <label>
+            Optional IG Proxy URL
+            <input id="proxyUrl" name="proxyUrl" placeholder="http://user:pass@host:port" />
+          </label>
+          <button type="submit">Connect</button>
+          <button id="disconnectBtn" type="button" class="secondary">Disconnect</button>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2>Chat with Heho</h2>
+        <form id="chatForm" class="chat-row">
+          <input id="chatInput" placeholder="Type a message for Heho" required />
+          <button type="submit">Send</button>
+        </form>
+        <div id="chatOutput" class="chat-output"></div>
+      </section>
+
+      <section class="card">
+        <h2>Live Logs</h2>
+        <p class="muted">Shows connection events, incoming IG messages, Heho replies, and send status.</p>
+        <div id="logList" class="logs"></div>
+      </section>
+    </main>
+
+    <script src="/script.js"></script>
+  </body>
+</html>
